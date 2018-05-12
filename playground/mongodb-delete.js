@@ -21,13 +21,16 @@ MongoClient.connect( 'mongodb://localhost:27017/TodoApp',
     var queryByText = { text: 'Walk the dog' };
     var queryAll = {};
     
-    db.collection( 'Todos' ).findOneAndDelete( queryByCompleted ).then( (result) => {
-       console.log( JSON.stringify( result ) );
-    });
-    
+//    db.collection( 'Todos' ).findOneAndDelete( queryByCompleted ).then( (result) => {
+//       console.log( JSON.stringify( result, undefined, 2 ) );
+//    });
 
+//    db.collection( 'Todos' ).deleteMany( queryByText ).then( (results) => {
+//       console.log( JSON.stringify( results, undefined, 2 ) );
+//    });
+    
 //    db.collection( 'Todos' ).deleteOne( queryByText ).then( (results) => {
-//       console.log( JSON.stringify( results ) );
+//       console.log( JSON.stringify( results, undefined, 2 ) );
 //    });
     
     
