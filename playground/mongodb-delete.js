@@ -18,40 +18,29 @@ MongoClient.connect( 'mongodb://localhost:27017/TodoApp',
     var queryById = { _id: new ObjectID( '5af74ba5fcda92999c2a7167' ) };
     var queryByCompleted = { completed: false };
     var queryByName = { name: 'Pat' };
+    var queryByText = { text: 'Walk the dog' };
     var queryAll = {};
     
-    var cursor = db.collection( 'Users' ).find( queryByName );
-    
-    cursor.toArray().then( ( docs ) => {
-        console.log( 'Todos:' );
-        console.log( JSON.stringify( docs, undefined, 2 ) );
-    }, (err) => {
-        console.log( 'Unable to fetch todos', err  );
+    db.collection( 'Todos' ).findOneAndDelete( queryByCompleted ).then( (result) => {
+       console.log( JSON.stringify( result ) );
     });
+    
 
-    
-    cursor.count().then( ( count ) => {
-        console.log( `Count[${count}]` );
-    }, (err) => {
-        console.log( 'Unable to fetch count', err  );
-    });
+//    db.collection( 'Todos' ).deleteOne( queryByText ).then( (results) => {
+//       console.log( JSON.stringify( results ) );
+//    });
     
     
-//    db.collection( 'Todos' ).insertOne( {
-//        text: 'Something to do',
-//        completed: false
-//    }, ( err, result ) => {
-//        
-//        if( err )
-//            {
-//                console.log( 'Unable to insert todo', err  );
-//                return;
-//            }
-//        
-//        console.log( JSON.stringify( result.ops, undefined, 2 ) );
-//        
-//    } );
     
+//    var cursor = db.collection( 'Users' ).find( queryByName );
+//    
+//    cursor.toArray().then( ( docs ) => {
+//        console.log( 'Todos:' );
+//        console.log( JSON.stringify( docs, undefined, 2 ) );
+//    }, (err) => {
+//        console.log( 'Unable to fetch todos', err  );
+//    });
+//
     
 //    db.collection( 'Users' ).insertOne( {
 //        name: 'Steve Rosenberry',
