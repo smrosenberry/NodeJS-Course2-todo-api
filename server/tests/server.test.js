@@ -1,7 +1,7 @@
 const request = require( 'supertest' );
-const expect  = require( 'expect' );
+const expect  = require( 'expect'    );
 
-const {app}  = require( './../server' );
+const {app}  = require( './../server.js'      );
 const {Todo} = require( './../models/todo.js' );
 const {User} = require( './../models/user.js' );
 

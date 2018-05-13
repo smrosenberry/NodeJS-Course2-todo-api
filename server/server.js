@@ -1,11 +1,13 @@
+require( './config/config.js' );
+
 const _           = require( 'lodash'      );
 const express     = require( 'express'     );
 const bodyParser  = require( 'body-parser' );
-const {ObjectID} = require( 'mongodb' );
+const {ObjectID}  = require( 'mongodb'     );
 
-var {mongoose}    = require( './db/mongoose.js' );
-var {Todo}        = require( './models/todo.js' );
-var {User}        = require( './models/user.js' );
+var {mongoose}    = require( './db/mongoose.js'   );
+var {Todo}        = require( './models/todo.js'   );
+var {User}        = require( './models/user.js'   );
 
 
 
@@ -152,7 +154,7 @@ function sendError( res, code, message )
 //});
 //
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 app.listen( port, () => {
     console.log( `Started on port ${port}` );
