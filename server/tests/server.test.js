@@ -5,8 +5,20 @@ const {app}  = require( './../server' );
 const {Todo} = require( './../models/todo.js' );
 const {User} = require( './../models/user.js' );
 
+
+const todos = [
+    {text: 'First test todo'},
+    {text: 'Second test todo'},
+    {text: 'Third test todo'}
+];
+
+
 beforeEach( (done) => {
-   Todo.remove({}).then(() =>done()); 
+   Todo.remove({})
+    .then(() => {
+       Todo.insertMany( todos );
+    })
+    .then( () => done() );
 });
 
 describe( 'Todo-API', () => { 
@@ -31,7 +43,7 @@ describe( 'Todo-API', () => {
                     return;
                 }
                 
-                Todo.find().then( (todos ) => {
+                Todo.find({text}).then( (todos ) => {
                     expect( todos.length  ).toBe( 1    );
                     expect( todos[0].text ).toBe( text );
                     done();
@@ -51,27 +63,30 @@ describe( 'Todo-API', () => {
                 }
                 
                 Todo.find().then( (todos ) => {
-                    expect( todos.length  ).toBe( 0 );
+                    expect( todos.length  ).toBe( 3 );
                     done();
-                  }).catch( (err) => done( err ) )
+                  }).catch( (err) => done( err ) );
               });
         });
         
     });
     
+
+    describe( 'GET /todos', () => { 
+
+        it( 'should get all todos', (done) => {
+            request(app)
+              .get('/todos')
+              .expect( 200 )
+              .expect( 'Content-Type', /json/ )
+              .expect( (res) => { 
+                expect( res.body.todos.length ).toBe( 3 );
+                })
+              .end( done );
+            });
+    });
     
-//    describe( 'GET /', () => { 
-//
-//        it( 'respond with html', (done) => {
-//            request(app)
-//              .get('/')
-//              .set( 'Accept', 'application/html' )
-//              .expect( 200 )
-//              .expect( 'Content-Type', /html/ )
-//              .expect( 'Hello world!' )
-//              .expect(200, done);
-//        });
-//    });
+    
 //    
 //    describe( 'GET /no', () => { 
 //        it( 'respond with json error', (done) => {
