@@ -1,12 +1,13 @@
+const _           = require( 'lodash'      );
 const express     = require( 'express'     );
 const bodyParser  = require( 'body-parser' );
+const {ObjectID} = require( 'mongodb' );
 
 var {mongoose}    = require( './db/mongoose.js' );
 var {Todo}        = require( './models/todo.js' );
 var {User}        = require( './models/user.js' );
 
 
-const {ObjectID} = require( 'mongodb' );
 
 var app = express();
 
@@ -72,6 +73,39 @@ app.get( '/todos/:id', ( req, res ) => {
         res.status( 200 ).send( {todo} ); 
     }, (err) => {
         sendError( res, 500, `Internal error finding todo for id[${todoId}]` );
+        return;
+    });
+    
+});
+
+
+app.put( '/todos/:id', ( req, res ) => {
+    
+    var todoId = req.params.id;
+    var body   = _.pick( req.body, [ 'text', 'completed' ] );
+    
+    if( !ObjectID.isValid( todoId ) )
+    {
+        sendError( res, 400, `todoId[${todoId}] is invalid.` );
+        return;
+    }
+    
+    if ( _.isBoolean( body.completed ) && body.completed ) {
+        body.completedAt = new Date().getTime();
+    } else {
+        body.completed   = false;
+        body.completedAt = null;
+    }
+    
+    Todo.findByIdAndUpdate( todoId, { $set: body }, { new: true } ).then( (todo) => {
+        if( !todo )
+        {
+            sendError( res, 404, `Todo not found for todoId[${todoId}].` );
+            return;
+        }
+        res.status( 200 ).send( {todo} ); 
+    }, (err) => {
+        sendError( res, 500, `Internal error updating todo for id[${todoId}]` );
         return;
     });
     
