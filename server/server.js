@@ -9,6 +9,7 @@ var app = express();
 
 app.use( bodyParser.json() );
 
+
 app.post( '/todos', ( req, res ) => {
     console.log( req.body );
     
@@ -26,9 +27,17 @@ app.post( '/todos', ( req, res ) => {
     
 });
 
+
 app.get( '/todos', ( req, res ) => {
-    res.status( 404 ).send( {error: 'Page not found.' } );
+    Todo.find().then( (todos) => {
+        res.status( 200 ).send( {todos} ); 
+    }, (err) => {
+        res.status( 400 ).send( err );
+    });
+    
 });
+
+
 //
 //app.get( '/users', ( req, res ) => {
 //    res.send( [ {name: 'Steve',     age: 58 },
