@@ -10,7 +10,7 @@ const {ObjectID} = require( 'mongodb' );
 const todos = [
     { _id: new ObjectID(), text: 'First test todo'  },
     { _id: new ObjectID(), text: 'Second test todo' },
-    { _id: new ObjectID(), text: 'Third test todo'  }
+    { _id: new ObjectID(), text: 'Third test todo', completed: true, completedAt: 333  }
 ];
 
 
@@ -113,6 +113,58 @@ describe( 'Todo-API', () => {
             });
     
     });
+    
+
+    describe( 'PUT /todos', () => { 
+
+        it( 'should update one todo by id', (done) => {
+            var text = "test update text";
+            request(app)
+              .put(`/todos/${todos[1]._id}`)
+              .send( { text: text, completed: true } )
+              .expect( 200 )
+              .expect( 'Content-Type', /json/ )
+              .expect( (res) => { 
+                expect( res.body.todo._id         ).toBe( todos[1]._id.toString() );
+                expect( res.body.todo.text        ).toBe( text );
+                expect( res.body.todo.completed   ).toBe( true );
+                //expect( res.body.todo.completedAt ).toBeA( 'number' );
+                expect( res.body.todo.completedAt ).toBeGreaterThan( 0 );
+                })
+              .end( done );
+            });
+    
+        it( 'should clear completedAt for one todo by id', (done) => {
+            request(app)
+              .put(`/todos/${todos[2]._id}`)
+              .send( { completed: false } )
+              .expect( 200 )
+              .expect( 'Content-Type', /json/ )
+              .expect( (res) => { 
+                expect( res.body.todo._id  ).toBe( todos[2]._id.toString() );
+                expect( res.body.todo.text ).toBe( todos[2].text );
+                expect( res.body.todo.completed   ).toBe( false );
+                expect( res.body.todo.completedAt ).toBe( null  );
+                })
+              .end( done );
+            });
+    
+        it( 'should get 400 invalid id', (done) => {
+            request(app)
+              .put('/todos/111')
+              .expect( 400 )
+              .end( done );
+            });
+    
+        it( 'should get 404 id not found', (done) => {
+            request(app)
+              .put(`/todos/${new ObjectID()}`)
+              .expect( 404 )
+              .end( done );
+            });
+    
+    });
+    
     
     describe( 'DELETE /todos', () => { 
 
