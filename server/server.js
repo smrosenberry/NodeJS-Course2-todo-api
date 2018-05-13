@@ -32,6 +32,16 @@ app.post( '/todos', ( req, res ) => {
 });
 
 
+app.get( '/', ( req, res ) => {
+    
+    res.status( 200 ).send( `<p>Todo App available!</p>
+                             <p>PORT: ${process.env.PORT}<\p>
+                             <p>MONGODB_URI: ${process.env.MONGODB_URI}<\p>`
+                          ); 
+    
+});
+
+
 app.get( '/todos', ( req, res ) => {
     
     Todo.find().then( (todos) => {
