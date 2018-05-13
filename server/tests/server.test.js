@@ -5,11 +5,12 @@ const {app}  = require( './../server' );
 const {Todo} = require( './../models/todo.js' );
 const {User} = require( './../models/user.js' );
 
+const {ObjectID} = require( 'mongodb' );
 
 const todos = [
-    {text: 'First test todo'},
-    {text: 'Second test todo'},
-    {text: 'Third test todo'}
+    { _id: new ObjectID(), text: 'First test todo'  },
+    { _id: new ObjectID(), text: 'Second test todo' },
+    { _id: new ObjectID(), text: 'Third test todo'  }
 ];
 
 
@@ -84,6 +85,33 @@ describe( 'Todo-API', () => {
                 })
               .end( done );
             });
+
+        it( 'should get one todo by id', (done) => {
+            request(app)
+              .get(`/todos/${todos[1]._id}`)
+              .expect( 200 )
+              .expect( 'Content-Type', /json/ )
+              .expect( (res) => { 
+                expect( res.body.todo._id  ).toBe( todos[1]._id.toString() );
+                expect( res.body.todo.text ).toBe( todos[1].text );
+                })
+              .end( done );
+            });
+    
+        it( 'should get 400 invalid id', (done) => {
+            request(app)
+              .get('/todos/111')
+              .expect( 400 )
+              .end( done );
+            });
+    
+        it( 'should get 404 id not found', (done) => {
+            request(app)
+              .get(`/todos/${new ObjectID()}`)
+              .expect( 404 )
+              .end( done );
+            });
+    
     });
     
     
