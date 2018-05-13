@@ -114,6 +114,57 @@ describe( 'Todo-API', () => {
     
     });
     
+    describe( 'DELETE /todos', () => { 
+
+//        it( 'should delete all todos', (done) => {
+//            request(app)
+//              .delete('/todos')
+//              .expect( 200 )
+//              .expect( 'Content-Type', /json/ )
+//              .expect( (res) => { 
+//                expect( res.body.n ).toBe( 3 );
+//                })
+//              .end( done );
+//            });
+
+        it( 'should delete one todo by id', (done) => {
+            request(app)
+              .delete(`/todos/${todos[1]._id}`)
+              .expect( 200 )
+              .expect( 'Content-Type', /json/ )
+              .expect( (res) => { 
+                expect( res.body.todo._id  ).toBe( todos[1]._id.toString() );
+                expect( res.body.todo.text ).toBe( todos[1].text );
+                })
+              .end( (err, res) => {
+                    if( err ) {
+                        done(err);
+                        return;
+                    }
+                
+                    Todo.findById( todos[1]._id ).then( (todo ) => {
+                        expect( todo ).toBe( null );
+                        done();
+                      }).catch( (err) => done( err ) )
+                
+                });
+            });
+    
+        it( 'should get 400 invalid id', (done) => {
+            request(app)
+              .delete('/todos/111')
+              .expect( 400 )
+              .end( done );
+            });
+    
+        it( 'should get 404 id not found', (done) => {
+            request(app)
+              .delete(`/todos/${new ObjectID()}`)
+              .expect( 404 )
+              .end( done );
+            });
+    
+    });
     
 //    
 //    describe( 'GET /no', () => { 
