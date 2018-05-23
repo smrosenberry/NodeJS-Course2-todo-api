@@ -32,7 +32,8 @@ var UserSchema = new mongoose.Schema({
     }]
 });
 
-const salt = 'abc123';
+const accessToken = 'auth';
+const salt        = 'abc123';
 
 UserSchema.methods.toJSON = function () {
     var user = this;
@@ -43,8 +44,8 @@ UserSchema.methods.toJSON = function () {
 UserSchema.methods.generateAuthToken = function() {
     var user = this;
     
-    var access = 'auth';
-    var token  = jwt.sign( { _id: user._id.toHexString(), access}, salt ).toString();
+    var access = accessToken;
+    var token  = jwt.sign( { _id: user._id.toHexString(), access }, salt ).toString();
     
     user.tokens.push( { access, token } );
     
@@ -52,6 +53,27 @@ UserSchema.methods.generateAuthToken = function() {
         return( token );
     });
            
+}
+
+UserSchema.statics.findByToken = function( token ) {
+    var User = this;
+    var decoded;
+    //console.log( `token[${ JSON.stringify( token, undefined, 2 ) }]` );
+    
+    try {
+        decoded = jwt.verify( token, salt );
+        //console.log( `decoded[${ JSON.stringify( decoded, undefined, 2 ) }]` );
+    }
+    catch( err ) {
+        console.log( `UserSchema.findByToken encountered err[${err}]` );
+        return Promise.reject();
+    }
+
+    return User.findOne( { '_id'           : decoded._id, 
+                           'tokens.token'  : token,
+                           'tokens.access' : accessToken } );
+    
+    
 }
 
 var User = mongoose.model( 'User', UserSchema );
