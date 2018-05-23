@@ -20,7 +20,7 @@ app.use( bodyParser.json() );
 console.log( `authHeader[${authHeader}]` );
 
 
-app.post( '/todos', ( req, res ) => {
+app.post( '/todos', authenticate, ( req, res ) => {
     
     console.log( req.body );
     
@@ -49,7 +49,7 @@ app.get( '/', ( req, res ) => {
 });
 
 
-app.get( '/todos', ( req, res ) => {
+app.get( '/todos', authenticate, ( req, res ) => {
     
     Todo.find().then( (todos) => {
         res.status( 200 ).send( {todos} ); 
@@ -60,7 +60,7 @@ app.get( '/todos', ( req, res ) => {
 });
 
 
-app.get( '/todos/:id', ( req, res ) => {
+app.get( '/todos/:id', authenticate, ( req, res ) => {
     
     var todoId = req.params.id;
     
@@ -85,7 +85,7 @@ app.get( '/todos/:id', ( req, res ) => {
 });
 
 
-app.put( '/todos/:id', ( req, res ) => {
+app.put( '/todos/:id', authenticate, ( req, res ) => {
     
     var todoId = req.params.id;
     var body   = _.pick( req.body, [ 'text', 'completed' ] );
@@ -118,7 +118,7 @@ app.put( '/todos/:id', ( req, res ) => {
 });
 
 
-app.delete( '/todos/:id', ( req, res ) => {
+app.delete( '/todos/:id', authenticate, ( req, res ) => {
     
     var todoId = req.params.id;
     
