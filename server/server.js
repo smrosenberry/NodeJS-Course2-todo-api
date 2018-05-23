@@ -1,9 +1,9 @@
 require( './config/config.js' );
 
-const _           = require( 'lodash'      );
-const express     = require( 'express'     );
-const bodyParser  = require( 'body-parser' );
-const {ObjectID}  = require( 'mongodb'     );
+const _           = require( 'lodash'       );
+const express     = require( 'express'      );
+const bodyParser  = require( 'body-parser'  );
+const {ObjectID}  = require( 'mongodb'      );
 
 var {mongoose}    = require( './db/mongoose.js'   );
 var {Todo}        = require( './models/todo.js'   );
@@ -137,6 +137,29 @@ app.delete( '/todos/:id', ( req, res ) => {
     });
     
 });
+
+
+app.post( '/users', ( req, res ) => {
+    
+    console.log( req.body );
+    
+    var body = _.pick( req.body, [ 'email', 'password' ] );
+    
+    var newUser = new User( body );
+
+    newUser.save().then( () => {
+//        console.log( 'Saved user to database', JSON.stringify( newUser, undefined, 2 ) );
+        return newUser.generateAuthToken();
+    }).then( (token) => {
+        res.header( 'x-auth', token ).send( newUser );
+    }).catch( (err) => {
+        console.log( 'Unable to save todo', err );
+        res.status(400).send( err );
+    });
+    
+});
+
+
 
 
 function sendError( res, code, message )
