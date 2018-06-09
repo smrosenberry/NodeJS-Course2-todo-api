@@ -17,7 +17,7 @@ var app = express();
 
 app.use( bodyParser.json() );
 
-console.log( `authHeader[${authHeader}]` );
+//console.log( `authHeader[${authHeader}]` );
 
 
 app.post( '/todos', authenticate, ( req, res ) => {
@@ -29,10 +29,10 @@ app.post( '/todos', authenticate, ( req, res ) => {
     });
 
     newTodo.save().then( ( doc ) => {
-        console.log( 'Saved todo to database', JSON.stringify( doc, undefined, 2 ) );
+        //console.log( 'Saved todo to database', JSON.stringify( doc, undefined, 2 ) );
         res.status(200).send( doc );
     }, (err) => {
-        console.log( 'Unable to save todo', err );
+        //console.log( 'Unable to save todo', err );
         res.status(400).send( err );
     });
     

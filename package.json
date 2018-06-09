@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server/server.js",
-    "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha server/**/*.test.js",
+    "start": "node mocha server/server.js --timeout=5000",
+    "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha server/**/*.test.js --timeout=5000",
     "test-watch": "nodemon --exec \"npm test\""
   },
   "engines": {
@@ -21,6 +21,7 @@
     "jsonwebtoken": "^8.2.1",
     "mongodb": "^3.1.0-beta4",
     "mongoose": "^5.1.0",
+    "npm": "^6.1.0",
     "validator": "^10.2.0"
   },
   "devDependencies": {

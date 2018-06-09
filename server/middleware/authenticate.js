@@ -1,6 +1,6 @@
-var {User} = require( './../models/user.js'   );
+var {User} = require( './../models/user.js' );
 
-const authHeader = 'x-auth';
+const authHeader = 'x-' + User.authTokenName;
 
 var authenticate = ( req, res, next ) => {
     

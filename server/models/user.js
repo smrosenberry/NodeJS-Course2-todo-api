@@ -33,8 +33,8 @@ var UserSchema = new mongoose.Schema({
     }]
 });
 
-const accessToken = 'auth';
-const salt        = 'abc123';
+const authTokenName = 'auth';
+const jwtSecret  = 'abc123';
 
 UserSchema.methods.toJSON = function () {
     var user = this;
@@ -48,12 +48,12 @@ UserSchema.pre( 'save', function( next ) {
     
     if( user.isModified( 'password' ) ) {
         
-        bcrypt.genSalt( 10, (err, salt) => {
+        bcrypt.genSalt( 10, (err, jwtSecret) => {
 
-//            console.log( `salt[${salt}]` );
+//            console.log( `jwtSecret[${jwtSecret}]` );
 //            console.log( `user.password[${user.password}]` );
 
-            bcrypt.hash( user.password, salt, (err, hash) => {
+            bcrypt.hash( user.password, jwtSecret, (err, hash) => {
                 user.password = hash;
 //                console.log( `hashed user.password[${user.password}]` );
                 next();
@@ -72,10 +72,9 @@ UserSchema.methods.generateAuthToken = function() {
     
     var user = this;
     
-    var access = accessToken;
-    var token  = jwt.sign( { _id: user._id.toHexString(), access }, salt ).toString();
+    var token  = jwt.sign( { _id: user._id.toHexString(), authTokenName }, jwtSecret ).toString();
     
-    user.tokens.push( { access, token } );
+    user.tokens.push( { authTokenName, token } );
     
     return user.save().then( ()=> {
         return( token );
@@ -89,7 +88,7 @@ UserSchema.statics.findByToken = function( token ) {
     //console.log( `token[${ JSON.stringify( token, undefined, 2 ) }]` );
     
     try {
-        decoded = jwt.verify( token, salt );
+        decoded = jwt.verify( token, jwtSecret );
         //console.log( `decoded[${ JSON.stringify( decoded, undefined, 2 ) }]` );
     }
     catch( err ) {
@@ -99,13 +98,16 @@ UserSchema.statics.findByToken = function( token ) {
 
     return User.findOne( { '_id'           : decoded._id, 
                            'tokens.token'  : token,
-                           'tokens.access' : accessToken } );
+                           'tokens.access' : authTokenName } );
     
     
 }
 
+UserSchema.statics.authTokenName = authTokenName;
+UserSchema.statics.jwtSecret     = jwtSecret;
+
 var User = mongoose.model( 'User', UserSchema );
 
 module.exports = {
-    User : User
+    User,
 }

@@ -5,9 +5,9 @@ const bcrypt   = require( "bcryptjs"     );
 var password = 'abc123!';
 var hashValue;
 
-bcrypt.genSalt( 10, (err, salt) => {
-    console.log(`salt[${salt}]`);
-    bcrypt.hash( password, salt, (err, hash) => {
+bcrypt.genSalt( 10, (err, jwtSecret) => {
+    console.log(`jwtSecret[${jwtSecret}]`);
+    bcrypt.hash( password, jwtSecret, (err, hash) => {
         console.log(`hash[${hash}]`);
         //hashValue = hash;
     })
