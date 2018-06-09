@@ -17,9 +17,6 @@ var app = express();
 
 app.use( bodyParser.json() );
 
-//console.log( `authHeader[${authHeader}]` );
-
-
 app.post( '/todos', authenticate, ( req, res ) => {
     
     console.log( req.body );
@@ -29,10 +26,8 @@ app.post( '/todos', authenticate, ( req, res ) => {
     });
 
     newTodo.save().then( ( doc ) => {
-        //console.log( 'Saved todo to database', JSON.stringify( doc, undefined, 2 ) );
         res.status(200).send( doc );
     }, (err) => {
-        //console.log( 'Unable to save todo', err );
         res.status(400).send( err );
     });
     
@@ -144,7 +139,7 @@ app.delete( '/todos/:id', authenticate, ( req, res ) => {
 
 app.post( '/users', ( req, res ) => {
     
-    console.log( req.body );
+    console.log( '/users: ' + JSON.stringify( req.body, undefined, 2 ) );
     
     var body = _.pick( req.body, [ 'email', 'password' ] );
     
@@ -156,7 +151,7 @@ app.post( '/users', ( req, res ) => {
     }).then( (token) => {
         res.header( authHeader, token ).send( newUser );
     }).catch( (err) => {
-        console.log( 'Unable to save todo', err );
+        console.log( 'Unable to save user', err );
         res.status( 400 ).send( err );
     });
     
@@ -165,17 +160,15 @@ app.post( '/users', ( req, res ) => {
 
 app.post( '/users/login', ( req, res ) => {
     
-    console.log( req.body );
-    
     var body = _.pick( req.body, [ 'email', 'password' ] );
     
     User.findByCredentials( body.email, body.password ).then( (user) => {
         return user.generateAuthToken().then( (token) => {
-            res.header( authHeader, token ).send( newUser );
+            res.header( authHeader, token ).send( user );
         });
-    } ).catch( (err) => {
-        res.status( 400 ).send();
-    })
+    }).catch( (err) => {
+        res.status( 400 ).send( err );
+    });
     
 });
 
@@ -194,13 +187,6 @@ function sendError( res, code, message )
     return;
 }
 
-//
-//app.get( '/users', ( req, res ) => {
-//    res.send( [ {name: 'Steve',     age: 58 },
-//                {name: 'Pat',       age: 62 },
-//                {name: 'Stephenie', age: 32 }] );
-//});
-//
 
 const port = process.env.PORT;
 
@@ -209,41 +195,3 @@ app.listen( port, () => {
 } );
 
 module.exports.app = app;
-
-
-
-
-
-//var newTodo = new Todo( {
-//    text: 'Cook dinner',
-//    completed: false,
-//    completedAt: 12345
-//});
-//
-//newTodo.save().then( ( doc ) => {
-//    console.log( 'Saved todo to database', JSON.stringify( doc, undefined, 2 ) );
-//}, (err) => {
-//    console.log( 'Unable to save todo', err );
-//});
-//
-//
-//var newUser = new User( {
-//    email: 'steve.rosenberry@gmail.com'
-//});
-//
-//newUser.save().then( ( doc ) => {
-//    console.log( 'Saved user to database', JSON.stringify( doc, undefined, 2 ) );
-//}, (err) => {
-//    console.log( 'Unable to save user', err );
-//});
-//
-//
-//var newUser2 = new User( {
-//    email: 'x'
-//});
-//
-//newUser2.save().then( ( doc ) => {
-//    console.log( 'Saved user to database', JSON.stringify( doc, undefined, 2 ) );
-//}, (err) => {
-//    console.log( 'Unable to save user', err );
-//});

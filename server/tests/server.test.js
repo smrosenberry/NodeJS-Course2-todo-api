@@ -3,11 +3,12 @@ require( './../config/config.js' );
 const request = require( 'supertest' );
 const expect  = require( 'expect'    );
 
-const {mongoose} = require( './../db/mongoose.js' );
-const {app}      = require( './../server.js'      );
-const {Todo}     = require( './../models/todo.js' );
-const {User}     = require( './../models/user.js' );
-const seed       = require( './seed/seed.js'      );
+const {mongoose}   = require( './../db/mongoose.js' );
+const {app}        = require( './../server.js'      );
+const {Todo}       = require( './../models/todo.js' );
+const {User}       = require( './../models/user.js' );
+const {authHeader} = require( './../middleware/authenticate.js' );
+const seed         = require( './seed/seed.js'      );
 
 const {ObjectID} = require( 'mongodb' );
 
@@ -24,7 +25,7 @@ describe( 'Todo-API', () => {
             
             request(app)
               .post('/todos')
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .send( {text: text} )
               .expect( 200 )
               .expect( 'Content-Type', /json/ )
@@ -48,7 +49,7 @@ describe( 'Todo-API', () => {
         it( 'should NOT create todo with invalid body data', (done) => {
             request(app)
               .post('/todos')
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .send( {} )
               .expect( 400 )
               .end( (err, res) => {
@@ -72,7 +73,7 @@ describe( 'Todo-API', () => {
         it( 'should get all todos', (done) => {
             request(app)
               .get('/todos')
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .expect( 200 )
               .expect( 'Content-Type', /json/ )
               .expect( (res) => { 
@@ -84,7 +85,7 @@ describe( 'Todo-API', () => {
         it( 'should get one todo by id', (done) => {
             request(app)
               .get(`/todos/${seed.todos[1]._id}`)
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .expect( 200 )
               .expect( 'Content-Type', /json/ )
               .expect( (res) => { 
@@ -97,7 +98,7 @@ describe( 'Todo-API', () => {
         it( 'should get 400 invalid id', (done) => {
             request(app)
               .get('/todos/111')
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .expect( 400 )
               .end( done );
             });
@@ -105,7 +106,7 @@ describe( 'Todo-API', () => {
         it( 'should get 404 id not found', (done) => {
             request(app)
               .get(`/todos/${new ObjectID()}`)
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .expect( 404 )
               .end( done );
             });
@@ -119,7 +120,7 @@ describe( 'Todo-API', () => {
             var text = "test update text";
             request(app)
               .put(`/todos/${seed.todos[1]._id}`)
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .send( { text: text, completed: true } )
               .expect( 200 )
               .expect( 'Content-Type', /json/ )
@@ -136,7 +137,7 @@ describe( 'Todo-API', () => {
         it( 'should clear completedAt for one todo by id', (done) => {
             request(app)
               .put(`/todos/${seed.todos[2]._id}`)
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .send( { completed: false } )
               .expect( 200 )
               .expect( 'Content-Type', /json/ )
@@ -152,7 +153,7 @@ describe( 'Todo-API', () => {
         it( 'should get 400 invalid id', (done) => {
             request(app)
               .put('/todos/111')
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .expect( 400 )
               .end( done );
             });
@@ -160,7 +161,7 @@ describe( 'Todo-API', () => {
         it( 'should get 404 id not found', (done) => {
             request(app)
               .put(`/todos/${new ObjectID()}`)
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .expect( 404 )
               .end( done );
             });
@@ -184,7 +185,7 @@ describe( 'Todo-API', () => {
         it( 'should delete one todo by id', (done) => {
             request(app)
               .delete(`/todos/${seed.todos[1]._id}`)
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .expect( 200 )
               .expect( 'Content-Type', /json/ )
               .expect( (res) => { 
@@ -208,7 +209,7 @@ describe( 'Todo-API', () => {
         it( 'should get 400 invalid id', (done) => {
             request(app)
               .delete('/todos/111')
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .expect( 400 )
               .end( done );
             });
@@ -216,7 +217,7 @@ describe( 'Todo-API', () => {
         it( 'should get 404 id not found', (done) => {
             request(app)
               .delete(`/todos/${new ObjectID()}`)
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .expect( 404 )
               .end( done );
             });
@@ -228,7 +229,7 @@ describe( 'Todo-API', () => {
         it( 'respond with 404 error', (done) => {
             request(app)
               .get('/no')
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .expect( 404 )
 //              .expect( { error: 'Page not found.' } )
 //              .expect( (res) => {
@@ -247,7 +248,7 @@ describe( 'Todo-API', () => {
             
             request(app)
               .get('/users/me')
-              .set( 'x-auth', seed.users[0].tokens[0].token )
+              .set( authHeader, seed.users[0].tokens[0].token )
               .expect( 200 )
               .expect( 'Content-Type', /json/ )
               .expect( (res) => {
@@ -260,7 +261,7 @@ describe( 'Todo-API', () => {
         it( 'respond with unauthorized', (done) => {
             request(app)
               .get('/users/me')
-//              .set( 'x-auth', seed.users[1].tokens[0].token )
+//              .set( authHeader, seed.users[1].tokens[0].token )
               .expect( 401 )
               .expect( (res) => {
                     expect( res.body ).toEqual( {} );
@@ -284,9 +285,9 @@ describe( 'Todo-API', () => {
               .expect( 200 )
               .expect( 'Content-Type', /json/ )
               .expect( (res) => {
-                    expect( res.headers['x-auth'] ).toBeTruthy();
-                    expect( res.body._id          ).toBeTruthy();
-                    expect( res.body.email        ).toBe(email);
+                    expect( res.headers[authHeader] ).toBeTruthy();
+                    expect( res.body._id            ).toBeTruthy();
+                    expect( res.body.email          ).toBe(email);
                 })
               .end( (err) => {
                 if( err ) {
@@ -296,12 +297,14 @@ describe( 'Todo-API', () => {
                     expect(user).toBeTruthy();
                     expect(user.password).not.toBe(password);
                     done();
-                })
+                }).catch( (err) => {
+                    done( err );
+                });
             } );
         });
         
         it( 'should return validation errors if request invalid', (done) => {
-            var email = 'bad_example';
+            var email = 'bad_email';
             var password = 'abc'
             request(app)
               .post('/users')
@@ -320,6 +323,60 @@ describe( 'Todo-API', () => {
               .end( done );
         });
         
+    });
+    
+    describe( 'POST /users/login', () => { 
+        
+        it( 'should login user and return auth token', (done) => {
+            var email    = seed.users[1].email;
+            var password = seed.users[1].password;
+            request(app)
+              .post('/users/login')
+              .send( { email, password } )
+              .expect( 200 )
+              .expect( 'Content-Type', /json/ )
+              .expect( (res) => {
+                    expect( res.headers[authHeader] ).toBeTruthy();
+                    expect( res.body._id            ).toBeTruthy();
+                    expect( res.body.email          ).toBe( email );
+                })
+              .end( ( err, res ) => {
+                if( err ) {
+                    return( done(err) );
+                }
+                User.findById( seed.users[1]._id ).then( (user) => {
+                    expect( user.tokens[0] ).toMatchObject( { access: User.authTokenName,
+                                                              token:  res.headers[authHeader] } );
+                    done();
+                }).catch( (err) => {
+                    done( err );
+                });
+            } );
+        });
+        
+        it( 'should reject invalid login', (done) => {
+            var email    = seed.users[1].email;
+            var password = seed.users[1].password + '1';
+            request(app)
+              .post('/users/login')
+              .send( { email, password } )
+              .expect( 400 )
+              .expect( (res) => {
+                    expect( res.headers[authHeader] ).not.toBeTruthy();
+                })
+              .end( ( err, res ) => {
+                if( err ) {
+                    return( done(err) );
+                }
+                User.findById( seed.users[1]._id ).then( (user) => {
+                    expect( user.tokens.length ).toBe( 0 );
+                    done();
+                }).catch( (err) => {
+                    done( err );
+                });
+            } );
+        });
+
     });
     
 });
