@@ -70,11 +70,12 @@ UserSchema.pre( 'save', function( next ) {
 
 UserSchema.methods.generateAuthToken = function() {
     
-    var user = this;
+    var user   = this;
+    var access = authTokenName;
     
-    var token  = jwt.sign( { _id: user._id.toHexString(), authTokenName }, jwtSecret ).toString();
+    var token  = jwt.sign( { _id: user._id.toHexString(), access }, jwtSecret ).toString();
     
-    user.tokens.push( { authTokenName, token } );
+    user.tokens.push( { access, token } );
     
     return user.save().then( ()=> {
         return( token );
